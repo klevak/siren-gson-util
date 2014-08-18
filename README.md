@@ -1,4 +1,4 @@
 siren-gson-util
 ===============
 
-A utility for Java developers supporint the REST Siren Specification
+A utility for Java developers supporting the REST Siren Specification
