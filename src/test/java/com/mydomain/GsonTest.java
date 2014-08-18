@@ -1,16 +1,22 @@
 package com.mydomain;
 
+// stuff for testin
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-
 import java.util.ArrayList;
+
 
 import org.junit.Test;
 
+// our Siren data model
 import com.mydomain.api.model.*;
+
+// our DTOs or Pojo
 import com.mydomain.model.Department;
 import com.mydomain.model.Employee;
+
+// Google GSON
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -19,36 +25,45 @@ public class GsonTest {
 
 	
 	private Gson gson = new Gson();
-	private Gson gsonSerializingNulls = new GsonBuilder().serializeNulls().create();
 
+	// we are going to experient with a bunch of settings for google GSON
+	private Gson gsonSerializingNulls = new GsonBuilder().serializeNulls().create();
+	private Gson gsonDisableHtmlEscaping = new GsonBuilder().disableHtmlEscaping().create();
+
+
+	@Test
+	public void object2SirenEscapedLink() {
+		// new link 
+		String[] rel = {"self"};
+		Link l = new Link(rel, "http://api.mydomain.com/v1/weather?zipcode=04096","<title>page</title>");
+		String jsonString = gson.toJson(l);
+		
+		// then.  Note that we need to escape the \\u00XX values
+		assertThat(
+				jsonString,
+				is("{\"rel\":[\"self\"],\"href\":\"http://api.mydomain.com/v1/weather?zipcode\\u003d04096\",\"title\":\"\\u003ctitle\\u003epage\\u003c/title\\u003e\"}"));
+	}
+	
 	@Test
 	public void object2SirenLink() {
 		// new link 
 		String[] rel = {"self"};
-		Link l = new Link(rel, "http://api.mydomain.com/v1/weather","Weather API basepath");
-		String jsonString = gson.toJson(l);
-
-		System.out.println(jsonString);
+		Link l = new Link(rel, "http://api.mydomain.com/v1/weather?zipcode=04096","<title>page</title>");
+		String jsonString = gsonDisableHtmlEscaping.toJson(l);
 		
 		// then
 		assertThat(
 				jsonString,
-				is("{\"rel\":[\"self\"],\"href\":\"http://api.mydomain.com/v1/weather\",\"title\":\"Weather API basepath\"}"));
+				is("{\"rel\":[\"self\"],\"href\":\"http://api.mydomain.com/v1/weather?zipcode=04096\",\"title\":\"<title>page</title>\"}"));
 	}
 
 	@Test
 	public void object2SirenProperty() {
 		
-		Employee e = new Employee("Soo Philip Kim", "philipjkim@gmail.com",
-				Department.DEVELOPMENT, 2012);
-		
+		Employee e = new Employee("Soo Philip Kim", "philipjkim@gmail.com",Department.DEVELOPMENT, 2012);
 		Property p = new Property();
 		p.properties(e);
-		
 		String jsonString = gson.toJson(p);
-
-		System.out.println(jsonString);
-		
 		// then
 		assertThat(
 				jsonString,
@@ -72,8 +87,6 @@ public class GsonTest {
 		
 		Action a = new Action(name,title, method, href, type,fields);
 		String jsonString = gson.toJson(a);
-
-		System.out.println(jsonString);
 		
 		// then
 		assertThat(
@@ -90,10 +103,7 @@ public class GsonTest {
 		
 		Entity e = new Entity(classes);
 		
-		
 		String jsonString = gson.toJson(e);
-		
-		System.out.println(jsonString);
 		
 		// then
 		assertThat(jsonString,is("{\"classes\":[\"myclass-name\"]}"));
@@ -113,8 +123,7 @@ public class GsonTest {
 		e.rels(rels);
 		
 		String jsonString = gson.toJson(e);
-		
-		System.out.println(jsonString);
+
 		
 		// then
 		assertThat(jsonString,is("{\"rels\":[\"self\"],\"classes\":[\"myclass-name\"]}"));
@@ -136,8 +145,6 @@ public class GsonTest {
 		e.href("http://api.x.io/orders/42/items");
 		
 		String jsonString = gson.toJson(e);
-		
-		System.out.println(jsonString);
 		
 		// then
 		assertThat(jsonString,is("{\"rels\":[\"http://x.io/rels/order-items\"],\"href\":\"http://api.x.io/orders/42/items\",\"classes\":[\"items\",\"collection\"]}"));
@@ -174,8 +181,6 @@ public class GsonTest {
 		Link l = new Link(rel, "http://api.mydomain.com/v1/weather","Weather API basepath");
 		links.add(l);
 		
-		
-		
 		EntityRepresentation e = new EntityRepresentation();
 		e.properties(emp);
 		e.classes(classes);
@@ -183,8 +188,6 @@ public class GsonTest {
 		e.links(links);
 		
 		String jsonString = gson.toJson(e);
-		
-		System.out.println(jsonString);
 		
 		// then
 		assertThat(true,is(true));
