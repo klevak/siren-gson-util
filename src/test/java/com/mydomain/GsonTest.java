@@ -280,7 +280,7 @@ public class GsonTest {
 				
 		ArrayList<Link> links = new ArrayList<Link>();
 		String[] rel = {"self"};
-		Link l = new Link(rel, "http://api.mydomain.com/v1/weather","Weather API basepath");
+		Link l = new Link(rel, "http://api.mydomain.com/v1/employees","Employee API basepath");
 		links.add(l);
 		
 		EntityRepresentation e = new EntityRepresentation();
@@ -292,7 +292,7 @@ public class GsonTest {
 		String jsonString = gsonSetFieldNamingStrategy.toJson(e);
 		
 		// then
-		assertThat(jsonString,is("{\"properties\":{\"name\":\"Soo Philip Kim\",\"email\":\"philipjkim@gmail.com\",\"department\":\"DEVELOPMENT\",\"yearJoined\":2012},\"actions\":[{\"name\":\"add-employee\",\"title\":\"Add New Employee\",\"method\":\"PUT\",\"href\":\"http://api.mydomain.com/v1/employee\",\"type\":\"application/x-www-form-urlencoded\",\"fields\":[{\"name\":\"name\",\"title\":\"title\",\"type\":\"number\",\"value\":10}]}],\"links\":[{\"rel\":[\"self\"],\"href\":\"http://api.mydomain.com/v1/weather\",\"title\":\"Weather API basepath\"}],\"class\":[\"employee\"]}"));
+		assertThat(jsonString,is("{\"properties\":{\"name\":\"Soo Philip Kim\",\"email\":\"philipjkim@gmail.com\",\"department\":\"DEVELOPMENT\",\"yearJoined\":2012},\"actions\":[{\"name\":\"add-employee\",\"title\":\"Add New Employee\",\"method\":\"PUT\",\"href\":\"http://api.mydomain.com/v1/employee\",\"type\":\"application/x-www-form-urlencoded\",\"fields\":[{\"name\":\"name\",\"title\":\"title\",\"type\":\"number\",\"value\":10}]}],\"links\":[{\"rel\":[\"self\"],\"href\":\"http://api.mydomain.com/v1/employees\",\"title\":\"Employee API basepath\"}],\"class\":[\"employee\"]}"));
 	}
 
 	@Test
