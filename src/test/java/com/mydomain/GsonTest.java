@@ -4,21 +4,23 @@ package com.mydomain;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import java.util.ArrayList;
 
+import java.util.ArrayList;
 
 import org.junit.Test;
 
+
 // our Siren data model
 import com.mydomain.api.model.*;
-
 // our DTOs or Pojo
 import com.mydomain.model.Department;
 import com.mydomain.model.Employee;
 
+import com.google.gson.FieldNamingPolicy;
 // Google GSON
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 
 public class GsonTest {
 
@@ -29,8 +31,108 @@ public class GsonTest {
 	// we are going to experient with a bunch of settings for google GSON
 	private Gson gsonSerializingNulls = new GsonBuilder().serializeNulls().create();
 	private Gson gsonDisableHtmlEscaping = new GsonBuilder().disableHtmlEscaping().create();
+	private Gson gsonExcludeFieldsWithoutExpose = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+	private Gson gsonGenerateNonExecutableJson = new GsonBuilder().generateNonExecutableJson().create();
+	private Gson gsonSerializeNulls = new GsonBuilder().serializeNulls().create();
+	private Gson gsonSetFieldNamingPolicy = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+	private Gson gsonSetFieldNamingStrategy = new GsonBuilder().setFieldNamingStrategy(new SirenSpecFieldNamingPolicy()).create();
+	private Gson gsonExclusionStrategy = new GsonBuilder().setExclusionStrategies(new SirenSpecExclusionStrategy()).create();
 
+	@Test
+	public void object2SirenPropertyExclusionStrategy() {
+		
+		Employee e = new Employee("Soo Philip Kim", "philipjkim@gmail.com",Department.DEVELOPMENT, 2012);
+		Property p = new Property();
+		p.properties(e);
+		String jsonString = gsonExclusionStrategy.toJson(p);
+		// then
+		assertThat(
+				jsonString,
+				is("{\"properties\":{\"name\":\"Soo Philip Kim\",\"department\":\"DEVELOPMENT\",\"yearJoined\":2012}}"));
+	}
 
+	@Test
+	public void object2SirenPropertyFieldNamingStrategy() {
+		
+		Employee e = new Employee("Soo Philip Kim", "philipjkim@gmail.com",Department.DEVELOPMENT, 2012);
+		Property p = new Property();
+		p.properties(e);
+		String jsonString = gsonSetFieldNamingStrategy.toJson(p);
+		// then
+		assertThat(
+				jsonString,
+				is("{\"properties\":{\"name\":\"Soo Philip Kim\",\"email\":\"philipjkim@gmail.com\",\"department\":\"DEVELOPMENT\",\"yearJoined\":2012}}"));
+	}
+
+	@Test
+	public void object2SirenPropertyLowerCaseNamingPolicy() {
+		
+		Employee e = new Employee("Soo Philip Kim", "philipjkim@gmail.com",Department.DEVELOPMENT, 2012);
+		Property p = new Property();
+		p.properties(e);
+		String jsonString = gsonSetFieldNamingPolicy.toJson(p);
+		// then
+		assertThat(
+				jsonString,
+				is("{\"properties\":{\"name\":\"Soo Philip Kim\",\"email_address\":\"philipjkim@gmail.com\",\"department\":\"DEVELOPMENT\",\"year_joined\":2012}}"));
+	}
+
+	
+	@Test
+	public void object2SirenSerializeNullsJsonProperty() {
+		
+		Employee e = new Employee("Soo Philip Kim", "philipjkim@gmail.com",null, 2012);
+		Property p = new Property();
+		p.properties(e);
+		String jsonString = gsonSerializeNulls.toJson(p);
+		// then
+		assertThat(
+				jsonString,
+				is("{\"properties\":{\"name\":\"Soo Philip Kim\",\"emailAddress\":\"philipjkim@gmail.com\",\"department\":null,\"yearJoined\":2012}}"));
+	}
+	
+	@Test
+	public void object2SirenSerializeNullsJsonPropertyNeg() {
+		
+		Employee e = new Employee("Soo Philip Kim", "philipjkim@gmail.com",null, 2012);
+		Property p = new Property();
+		p.properties(e);
+		String jsonString = gson.toJson(p);
+		// then
+		assertThat(
+				jsonString,
+				is("{\"properties\":{\"name\":\"Soo Philip Kim\",\"emailAddress\":\"philipjkim@gmail.com\",\"yearJoined\":2012}}"));
+	}
+	
+	
+	@Test
+	public void object2SirenNonExecutableJsonProperty() {
+		
+		Employee e = new Employee("Soo Philip Kim", "philipjkim@gmail.com",Department.DEVELOPMENT, 2012);
+		Property p = new Property();
+		p.properties(e);
+		String jsonString = gsonGenerateNonExecutableJson.toJson(p);
+		// then
+		assertThat(
+				jsonString,
+				is(")]}'\n{\"properties\":{\"name\":\"Soo Philip Kim\",\"emailAddress\":\"philipjkim@gmail.com\",\"department\":\"DEVELOPMENT\",\"yearJoined\":2012}}"));
+	}
+	
+	
+	@Test
+	public void object2SirenHideNonExposedProperty() {
+		
+		Employee e = new Employee("Soo Philip Kim", "philipjkim@gmail.com",Department.DEVELOPMENT, 2012);
+		Property p = new Property();
+		p.properties(e);
+		String jsonString = gsonExcludeFieldsWithoutExpose.toJson(p);
+		// then
+		assertThat(
+				jsonString,
+				is(""));
+	}
+	
+	
 	@Test
 	public void object2SirenEscapedLink() {
 		// new link 
@@ -187,10 +289,10 @@ public class GsonTest {
 		e.actions(actions);
 		e.links(links);
 		
-		String jsonString = gson.toJson(e);
+		String jsonString = gsonSetFieldNamingStrategy.toJson(e);
 		
 		// then
-		assertThat(true,is(true));
+		assertThat(jsonString,is("{\"properties\":{\"name\":\"Soo Philip Kim\",\"email\":\"philipjkim@gmail.com\",\"department\":\"DEVELOPMENT\",\"yearJoined\":2012},\"actions\":[{\"name\":\"add-employee\",\"title\":\"Add New Employee\",\"method\":\"PUT\",\"href\":\"http://api.mydomain.com/v1/employee\",\"type\":\"application/x-www-form-urlencoded\",\"fields\":[{\"name\":\"name\",\"title\":\"title\",\"type\":\"number\",\"value\":10}]}],\"links\":[{\"rel\":[\"self\"],\"href\":\"http://api.mydomain.com/v1/weather\",\"title\":\"Weather API basepath\"}],\"class\":[\"employee\"]}"));
 	}
 
 	@Test

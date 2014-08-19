@@ -1,12 +1,16 @@
 package com.mydomain.model;
 
 import com.google.common.base.Objects;
+import com.google.gson.annotations.Expose;
 
 public class Employee {
 
-	private String name;
-	private String emailAddress;
-	private Department department;
+	@Expose private String name;
+	
+	@Expose (serialize = false) private String emailAddress;
+	
+	@Expose (serialize = true, deserialize = false) private Department department;
+
 	private Integer yearJoined;
 
 	public Employee(String name, String emailAddress, Department department,
