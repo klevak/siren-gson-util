@@ -173,6 +173,29 @@ public class GsonTest {
 	}
 
 	@Test
+	public void object2SirenPropertyWithLink() {
+		
+		ArrayList<Employee> employees = new ArrayList<Employee>();
+		
+		
+		Employee e = new Employee("Soo Philip Kim", "philipjkim@gmail.com",Department.DEVELOPMENT, 2012);
+		String[] rel = {"self"};
+		Link link = new Link(rel, "http://api.mydomain.com/v1/employee/" + e.getEmailAddress(),"<b>" + e.getName() + "</b>");
+		e.setLink(link);
+		
+		employees.add(e);
+		
+		
+		Property p = new Property();
+		p.properties(employees);
+		String jsonString = gson.toJson(p);
+		// then
+		assertThat(
+				jsonString,
+				is("{\"properties\":{\"name\":\"Soo Philip Kim\",\"emailAddress\":\"philipjkim@gmail.com\",\"department\":\"DEVELOPMENT\",\"yearJoined\":2012}}"));
+	}
+
+	@Test
 	public void object2SirenAction() {
 		// new action 
 		String[] rel = {"self"};

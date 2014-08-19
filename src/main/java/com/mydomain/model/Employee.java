@@ -2,6 +2,7 @@ package com.mydomain.model;
 
 import com.google.common.base.Objects;
 import com.google.gson.annotations.Expose;
+import com.mydomain.api.model.Link;
 
 public class Employee {
 
@@ -10,6 +11,8 @@ public class Employee {
 	@Expose (serialize = false) private String emailAddress;
 	
 	@Expose (serialize = true, deserialize = false) private Department department;
+	
+	@Expose private Link link;
 
 	private Integer yearJoined;
 
@@ -35,6 +38,10 @@ public class Employee {
 
 	public Integer getYearJoined() {
 		return yearJoined;
+	}
+	
+	public void setLink(Link link){
+		this.link = link;
 	}
 
 	@Override
